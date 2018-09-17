@@ -5,7 +5,7 @@ The place to start is in `code/Makefile_Driver.` Following the steps there will 
 # Requirements
 
 1. Local copy of 1000G Phase 3 VCF files
-	* Can be downloaded here: [ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/](ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/)
+	* Can be downloaded here: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
 1. Local copy of 1000G Phase 3 in IMPUTE2 reference format
 	* Can be downloaded here: https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.html
 	* The `./resources/annotated_legend` directory here contains custom annotated versions of the legend files, with a column that will allow imputation of variants with at least two copies in any of the super populations. Users will still need to download the reference panel haplotype files from IMPUTE2 (i.e. ".hap.gz")
