@@ -1,0 +1,138 @@
+## This is the top level Makefile for running the imputation-based genomic coverage pipeline
+# Triggers appear in anticipated chronological order
+# Each array needs to be run separately (i.e. this loops over chromosomes and sample batches, but not over arrays)
+
+# example syntax for running triggers in this file:
+# $ make -f Makefile_Driver <trigger name>
+## e.g.
+# $ make -f Makefile_Driver setup
+
+################################### Array definition section
+
+# Run one array at a time - i.e. leave only one "array" and "array_annot" argument uncommented at a time
+# The default array parsing script works for standard, g'zipped Illumina array annotation
+# There is also an example of a version customized for Affy annotations
+# New arrays/manifest configurations might require further adapting/customizing these scripts
+
+## OmniExpress
+array = OmniExpress
+array_annot = ../resources/array_annotations/humanomniexpress-24-v1-1-a.csv.gz
+arrayspec_script = ""
+
+## Affymetrix UK Biobank
+# array = Affy_UKBio
+# array_annot = ../resources/array_annotations/Axiom_UKB_WCSG.na35.annot.csv.gz
+# arrayspec_script = "_affy"
+
+################################### General arguments section
+
+# Specify main output directory path. Needs to end in the variable "$(array)"
+imp_dir = ../output/$(array)
+
+# start and end batch (1-10, unless testing)
+sbatch = 1
+ebatch = 1
+
+# start and end chromosome (1-23, unless testing)
+# will override chrom arguments in "Makefile"
+
+schr = 22
+echr = 22
+
+# Example compute cluster queue name; leave blank to use default
+# May vary between   
+queue = "bigmem.q"
+
+# for IMPUTE2 jobs and metrics calculations: 
+# to process all segments of your chromosome(s), specify "0" for want_segments
+# otherwise, specify segment number to re-run IMPUTE2 on just that segment (e.g., if failed due to memory 
+want_segments = "7"
+
+################################### Triggers section
+# each trigger below should be run separately and in the order shown, pausing between steps to ensure proper execution (e.g., review log files for potential error messages, ensure expected output has been produced, etc.)
+
+dir_setup:
+	make array_directory imp_dir=$(imp_dir)
+
+	make print_array_snps imp_dir=$(imp_dir) array_annot=$(array_annot) arrayspec=$(arrayspec_script) start_chrom=$(schr) end_chrom=$(echr)
+
+make_plink:
+	# submit to loop through make file commands by batch
+	./run_triggers_setup.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr) $(queue)
+	
+phase:
+	./run_triggers_phase.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr) $(queue)
+	
+# For monomorphic variants in .haps: populate the minor allele consistently across batches
+fix_haps:
+	./qsub_run_fix_haps.sh $(imp_dir) $(array) $(schr) $(echr) $(queue) $(sbatch) $(ebatch)
+
+impute:
+	./run_triggers_impute.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(prephased) $(schr) $(echr) $(queue) $(want_segments)
+	
+# check for successful completion of all imputation segments
+check_impute:
+	./run_triggers_check.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr)
+
+calculate_metrics:
+	make calculate_metrics imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue=$(queue) prephased=$(prephased) start_batch=$(sbatch) end_batch=$(ebatch) want_segments=$(want_segments)
+
+# check for succesful completion of all metrics jobs
+check_metrics:
+	./run_check_mets.sh $(imp_dir) $(schr) $(echr)
+
+# Run to create by-chrom metrics files, i.e. for posting (first did for 2013 G3 paper, posting supp files to CIDR online repository)
+combine_metrics:
+	make combine_outfiles imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue="bigmem.q"
+##############################
+# Run across multiple arrays - summarize and plot metrics
+# feed in list of arrays to compare as single character string, array names separated by ":", i.e. "OmniExpress:Omni2.5M" or "HumanCore:HumanCoreExome:OmniExpress:Omni2.5M:Omni2.5Exome"
+# order from least to most dense so that barplots will be ordered accordingly
+           # array   nsnps
+# 5      HumanCore  298930
+# 6 HumanCoreExome  538448
+# 8   AxiomBiobank  718212
+# 1    OmniExpress  730525
+# 7       AxiomWA4  818154
+# MEGArray
+# AffyPan Afr
+# 2       Omni2.5M 2379855
+# 3   Omni2.5Exome 2567845
+# 4         Omni5M 4301332
+
+#"HumanCore:HumanCoreExome:AxiomBiobank:OmniExpress:AxiomWA4:Omni2.5M:Omni2.5Exome"
+#"HumanCore:HumanCoreExome:AxiomBiobank:OmniExpress:AxiomWA4:Omni2.5M:Omni2.5Exome:Omni5M"
+
+# array_list = "ME_global:ME_eur:ME_amr:HumanCore:OmniExpress:Omni2.5M:Omni5M:Affy_UKBio"
+# array_list = "ME_global:ME_eur:ME_amr"
+
+# array_list = "HumanCore:GSA:OmniExpress:Affy_UKBio:ME_amr:ME_eur:ME_global:Omni2.5M:Omni5M"
+
+# array_list=GSA:ME_global
+
+# adding in Affy PMDA array
+array_list = "GSA:Affy_PMDA:ME_global"
+
+# makes metrics summaries
+summarize_metrics:
+	./qsub_summarize_snp_metrics.sh $(array_list) $(schr) $(echr) $(queue)
+
+# make plots
+plot_metrics:
+	./qsub_plot_snp_metrics.sh $(array_list) $(schr) $(echr) $(queue)
+	
+# Cleanup directory - delete unnecessary files
+cleanup:
+	./qsub_run_cleanup_dir.sh $(imp_dir) $(array) $(prephased)
+	
+# Cleanup directories - delete files moved to GCC_archive
+# arrays = HumanCore:HumanCoreExome
+# arrays = Omni2.5M
+# arrays = Omni2.5Exome:Omni5M:AxiomBiobank:AxiomWA4
+
+delete_archived:
+	./run_cleanup_postarchive.sh $(arrays) $(sbatch) $(ebatch) $(prephased)
+
+
+	
+
