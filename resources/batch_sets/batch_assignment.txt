@@ -1,4 +1,4 @@
-sample pop super_pop gender batch
+sample pop super_pop sex batch
 HG00096 GBR EUR male 2
 HG00097 GBR EUR female 7
 HG00099 GBR EUR female 9

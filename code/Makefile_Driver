@@ -43,14 +43,26 @@ echr = 22
 # May vary between   
 queue = "bigmem.q"
 
+# Code is in same directory as this Makefile
+code_dir = $(shell pwd)
+
 # for IMPUTE2 jobs and metrics calculations: 
 # to process all segments of your chromosome(s), specify "0" for want_segments
 # otherwise, specify segment number to re-run IMPUTE2 on just that segment (e.g., if failed due to memory 
-want_segments = "7"
+want_segments = "0"
+
+# e.g., if you just wanted to rerun segment #7 on the chromosome(s) specified in args schr and echr
+# want_segments = "0"
 
 ################################### Triggers section
 # each trigger below should be run separately and in the order shown, pausing between steps to ensure proper execution (e.g., review log files for potential error messages, ensure expected output has been produced, etc.)
 
+#### ONE-OFF TRIGGERS
+# this trigger is to make annotated versions of the 1000G legend files that are downloaded from IMPUTE2 reference resources - i.e. to add columns that flag variants with MAC >=2 in any one of the five super populations. only need to run once
+annotate_legends:
+	qsub -cwd -j y -N annotate_legends ./runRscript.sh add_legendfile_cols.R $(code_dir) $(schr) $(echr)	
+
+#### PER-ARRAY TRIGGERS
 dir_setup:
 	make array_directory imp_dir=$(imp_dir)
 
@@ -65,7 +77,7 @@ phase:
 	
 # For monomorphic variants in .haps: populate the minor allele consistently across batches
 fix_haps:
-	./qsub_run_fix_haps.sh $(imp_dir) $(array) $(schr) $(echr) $(queue) $(sbatch) $(ebatch)
+	./qsub_run_fix_haps.sh $(imp_dir) $(array) $(schr) $(echr) $(queue) $(sbatch) $(ebatch) $(code_dir)
 
 impute:
 	./run_triggers_impute.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(prephased) $(schr) $(echr) $(queue) $(want_segments)
@@ -84,7 +96,8 @@ check_metrics:
 # Run to create by-chrom metrics files, i.e. for posting (first did for 2013 G3 paper, posting supp files to CIDR online repository)
 combine_metrics:
 	make combine_outfiles imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue="bigmem.q"
-##############################
+	
+#### PER_PROJECT TRIGGERS
 # Run across multiple arrays - summarize and plot metrics
 # feed in list of arrays to compare as single character string, array names separated by ":", i.e. "OmniExpress:Omni2.5M" or "HumanCore:HumanCoreExome:OmniExpress:Omni2.5M:Omni2.5Exome"
 # order from least to most dense so that barplots will be ordered accordingly
