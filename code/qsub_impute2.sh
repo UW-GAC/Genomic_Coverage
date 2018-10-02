@@ -17,9 +17,13 @@ test=${13}
 prephased=${14}
 segments=${15}
 cpus_per_job=${16}
+code_dir=${17}
+array_dir=${18}
 
 out_dir="imputed"
 task="impute"
+
+echo $PWD
 
 echo "submitting imputation segments for chr $schr to $echr"
 
@@ -47,7 +51,7 @@ for chr in $(seq $schr $echr);do
 	echo "Starting on chr $chr"
 
 	## determine number of chunks in the chromosome
-	chunk_map=../resources/imputation_segments.csv
+	chunk_map=$array_dir/imputation_segments.csv
 	
 	echo -e "\t looking at ${chunk_map} for segment information"
 
@@ -70,7 +74,7 @@ for chr in $(seq $schr $echr);do
 		# to turn email notifications back on: -m e -M ${email}
 		 qsub -q $queue -N ${job_name}${chr}.${project} \
 		 -S /bin/bash -j y -t ${range} -cwd $pe_local_arg \
-		 $(dirname $(which $0))/run_impute2.sh $project $imp_dir $ref_dir $maf_column $maf_limit $strand_align $buffer $chr $chunk_size $test $prephased
+		 $code_dir/run_impute2.sh $project $imp_dir $ref_dir $maf_column $maf_limit $strand_align $buffer $chr $chunk_size $test $prephased $array_dir
 
 	 done # close segment loop
 	echo ""  # insert blank line at end of chrom's submission

@@ -52,7 +52,7 @@ code_dir = $(shell pwd)
 want_segments = "0"
 
 # e.g., if you just wanted to rerun segment #7 on the chromosome(s) specified in args schr and echr
-# want_segments = "0"
+# want_segments = "7"
 
 ################################### Triggers section
 # each trigger below should be run separately and in the order shown, pausing between steps to ensure proper execution (e.g., review log files for potential error messages, ensure expected output has been produced, etc.)
@@ -80,7 +80,7 @@ fix_haps:
 	./qsub_run_fix_haps.sh $(imp_dir) $(array) $(schr) $(echr) $(queue) $(sbatch) $(ebatch) $(code_dir)
 
 impute:
-	./run_triggers_impute.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(prephased) $(schr) $(echr) $(queue) $(want_segments)
+	./run_triggers_impute.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr) $(queue) $(want_segments) $(code_dir)
 	
 # check for successful completion of all imputation segments
 check_impute:

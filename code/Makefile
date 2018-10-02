@@ -52,7 +52,6 @@ want_segments = "0"
 # for genomic coverage - restricting to 6 jobs per node (2 cores per job) after some were dying
 cpus_per_job = "2"
 
-## Need to point to earlier version of IMPUTE2?
 chunk_size_mb = 5 
 buffer_size_kb = 500
 prephased = 1
@@ -99,7 +98,7 @@ shapeit2:
 	$(code_dir)/qsub_run_shapeit2.sh $(email) $(queue) $(project) $(imp_dir) $(ref_dir) $(start_chrom) $(end_chrom) $(test_shapeit) $(num_cores) $(graph) $(states) $(duoHMM) $(PAR)
 	
 impute2:
-	$(code_dir)/qsub_impute2.sh $(email) $(queue) $(project) $(imp_dir) $(ref_dir) $(maf_column) $(maf_limit) $(strand_align) $(start_chrom) $(end_chrom) $(chunk_size_mb) $(buffer_size_kb) $(test) $(prephased) $(want_segments) $(cpus_per_job)
+	$(code_dir)/qsub_impute2.sh $(email) $(queue) $(project) $(imp_dir) $(ref_dir) $(maf_column) $(maf_limit) $(strand_align) $(start_chrom) $(end_chrom) $(chunk_size_mb) $(buffer_size_kb) $(test) $(prephased) $(want_segments) $(cpus_per_job) $(code_dir) $(array_dir)
 
 # check for successful completion of imputation jobs
 check_imputation:
