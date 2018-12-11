@@ -76,7 +76,7 @@ make_plink:
 phase:
 	./run_triggers_phase.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr) $(queue)
 	
-# For monomorphic variants in .haps: populate the minor allele consistently across batches
+# for monomorphic variants in .haps: populate the minor allele consistently across batches
 fix_haps:
 	./qsub_run_fix_haps.sh $(imp_dir) $(array) $(schr) $(echr) $(queue) $(sbatch) $(ebatch) $(code_dir)
 
@@ -88,17 +88,16 @@ impute:
 check_impute:
 	./run_triggers_check.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr)
 
-# Calculate metrics: concordance and correlation between observed and imputed/non-array SNPs
-# NOTE - see required libraries in ./run_snp_metrics.R
+# calculate metrics: concordance and correlation between observed and imputed/non-array SNPs
+# check R library paths - edit in runRscript_array.sh
 calculate_metrics:
 	make calculate_metrics imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue=$(queue) start_batch=$(sbatch) end_batch=$(ebatch) want_segments=$(want_segments) code_dir=$(code_dir)
 
 # check for successful completion of all metrics jobs
-# check R library paths - edit in runRscript_array.sh
 check_metrics:
 	./run_check_mets.sh $(imp_dir) $(schr) $(echr)
 
-# Run to create by-chrom metrics files, i.e. for posting (first did for 2013 G3 paper, posting supp files to CIDR online repository)
+# run to create by-chrom metrics files, i.e. for posting (first did for 2013 G3 paper, posting supp files to CIDR online repository)
 combine_metrics:
 	make combine_outfiles imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue="bigmem.q"
 	
