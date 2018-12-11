@@ -100,17 +100,18 @@ shapeit2:
 impute2:
 	$(code_dir)/qsub_impute2.sh $(email) $(queue) $(project) $(imp_dir) $(ref_dir) $(maf_column) $(maf_limit) $(strand_align) $(start_chrom) $(end_chrom) $(chunk_size_mb) $(buffer_size_kb) $(test) $(prephased) $(want_segments) $(cpus_per_job) $(code_dir) $(array_dir)
 
-# check for successful completion of imputation jobs
+# Check for successful completion of imputation jobs
 check_imputation:
 	$(code_dir)/run_check_imputation_segs.sh $(project) $(imp_dir) $(start_chrom) $(end_chrom) $(array_dir)
 	
-# Calculate metrics: concordance and correlation between observed and imputed non-array SNPs
+# Calculate metrics: concordance and correlation between observed and imputed/non-array SNPs
 calculate_metrics:
-	$(curr_dir)/qsub_run_snp_metrics.sh $(email) $(queue) $(imp_dir) $(project) $(prephased) $(start_chrom) $(end_chrom) $(start_batch) $(end_batch) $(want_segments)
+	$(code_dir)/qsub_run_snp_metrics.sh $(email) $(queue) $(imp_dir) $(project) $(prephased) $(start_chrom) $(end_chrom) $(start_batch) $(end_batch) $(want_segments) $(code_dir)
 
 # Combine per-segment metrics files into gz-compressed per-chromosome files (for posting to CIDR URL)
 combine_outfiles:
-	$(curr_dir)/qsub_combine_outfiles.sh $(email) $(queue) $(project) $(imp_dir)  $(start_chrom) $(end_chrom) 
+	$(curr_dir)/qsub_combine_outfiles.sh $(email) $(queue) $(project) $(imp_dir)  $(start_chrom) $(end_chrom)
+
 
 
 

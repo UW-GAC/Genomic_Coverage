@@ -42,14 +42,14 @@ echr = 22
 
 # Example compute cluster queue name; leave blank to use default
 # May vary between   
-queue = "bigmem.q"
+queue = "topmed.q"
 
 # Code is in same directory as this Makefile
 code_dir = $(shell pwd)
 
 # for IMPUTE2 jobs and metrics calculations: 
 # to process all segments of your chromosome(s), specify "0" for want_segments
-# otherwise, specify segment number to re-run IMPUTE2 on just that segment (e.g., if failed due to memory 
+# otherwise, specify segment number to re-run IMPUTE2 on just that segment (e.g., if failed due to memory) 
 want_segments = "0"
 
 # e.g., if you just wanted to rerun segment #7 on the chromosome(s) specified in args schr and echr
@@ -88,10 +88,13 @@ impute:
 check_impute:
 	./run_triggers_check.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr)
 
+# Calculate metrics: concordance and correlation between observed and imputed/non-array SNPs
+# NOTE - see required libraries in ./run_snp_metrics.R
 calculate_metrics:
-	make calculate_metrics imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue=$(queue) prephased=$(prephased) start_batch=$(sbatch) end_batch=$(ebatch) want_segments=$(want_segments)
+	make calculate_metrics imp_dir=$(imp_dir) project=$(array) start_chrom=$(schr) end_chrom=$(echr) queue=$(queue) start_batch=$(sbatch) end_batch=$(ebatch) want_segments=$(want_segments) code_dir=$(code_dir)
 
-# check for succesful completion of all metrics jobs
+# check for successful completion of all metrics jobs
+# check R library paths - edit in runRscript_array.sh
 check_metrics:
 	./run_check_mets.sh $(imp_dir) $(schr) $(echr)
 
