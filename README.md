@@ -6,13 +6,16 @@ The place to start is in `code/Makefile_Driver.` Following the steps there will 
 
 1. Local copy of 1000G Phase 3 VCF files
 	* Can be downloaded here: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
+	* Save to ./resources/refpanel/vcf
 1. Local copy of 1000G Phase 3 in IMPUTE2 reference format
 	* Can be downloaded here: https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.html
+	* Save to ./resources/refpanel/impute2_fmt
 1. Genetic map files
 	* Can be downloaded here: https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.html
+	* Save to ./resources/refpanel/genetic_maps
 1. Computing cluster
 1. Array manifest(s) with chromosome and position in build 37 coordinates
-1. Software - need local, working installations of the following softwares. In parentheses are noted the version numbers in genomic coverae analyses last run at the GAC.
+1. Software - need local, working installations of the following softwares. In parentheses are noted the version numbers in genomic coverage analyses last run at the GAC.
 	* IMPUTE2 (2.3.3)
 	* SHAPEIT2 (v2.r904)
 	* PLINK (v1.90b6.2)
