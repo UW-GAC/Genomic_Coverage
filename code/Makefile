@@ -102,7 +102,7 @@ impute2:
 
 # check for successful completion of imputation jobs
 check_imputation:
-	$(curr_dir)/run_check_imputation_segs.sh $(project) $(imp_dir) $(start_chrom) $(end_chrom)
+	$(code_dir)/run_check_imputation_segs.sh $(project) $(imp_dir) $(start_chrom) $(end_chrom) $(array_dir)
 	
 # Calculate metrics: concordance and correlation between observed and imputed non-array SNPs
 calculate_metrics:

@@ -27,6 +27,7 @@ arrayspec_script = ""
 ################################### General arguments section
 
 # Specify main output directory path. Needs to end in the variable "$(array)"
+# note - would simplify to consistently name "../output/$(array)" as "array_dir" and "../output/$(array)/batch#" as "imp_dir" 
 imp_dir = ../output/$(array)
 
 # start and end batch (1-10, unless testing)
@@ -83,6 +84,7 @@ impute:
 	./run_triggers_impute.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr) $(queue) $(want_segments) $(code_dir)
 	
 # check for successful completion of all imputation segments
+# also reports total number of strand flips 
 check_impute:
 	./run_triggers_check.sh $(imp_dir) $(array) $(sbatch) $(ebatch) $(schr) $(echr)
 
