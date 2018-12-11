@@ -110,7 +110,7 @@ calculate_metrics:
 
 # Combine per-segment metrics files into gz-compressed per-chromosome files (for posting to CIDR URL)
 combine_outfiles:
-	$(curr_dir)/qsub_combine_outfiles.sh $(email) $(queue) $(project) $(imp_dir)  $(start_chrom) $(end_chrom)
+	$(code_dir)/qsub_combine_outfiles.sh $(email) $(queue) $(project) $(imp_dir) $(start_chrom) $(end_chrom)
 
 
 
