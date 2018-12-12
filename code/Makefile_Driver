@@ -108,10 +108,13 @@ combine_metrics:
 
 array_list = "OmniExpress"
 
+# specify output directory for metrics summaries and plots
+output_dir = "../output/plots"
+
 # makes metrics summaries
 summarize_metrics:
-	./qsub_summarize_snp_metrics.sh $(array_list) $(schr) $(echr) $(queue)
-
+	./qsub_summarize_snp_metrics.sh $(array_list) $(schr) $(echr) $(queue) $(code_dir) $(output_dir)
+	
 # make plots
 plot_metrics:
 	./qsub_plot_snp_metrics.sh $(array_list) $(schr) $(echr) $(queue)
